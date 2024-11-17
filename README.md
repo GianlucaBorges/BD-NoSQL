@@ -64,7 +64,7 @@ npm run dev
 
 ## **Esquema do Projeto**
 
-rest-api-prisma/
+```plaintext
 ├── prisma/
 │ ├── schema.prisma # Definição do modelo Prisma
 ├── src/
@@ -75,3 +75,4 @@ rest-api-prisma/
 ├── package.json # Configurações do projeto e dependências
 ├── tsconfig.json # Configuração do TypeScript
 └── README.md # Documentação do projeto
+```
