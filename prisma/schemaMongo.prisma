@@ -1,0 +1,25 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource mongodb {
+  provider = "mongodb"
+  url      = env("MONGODB_URL")
+}
+
+type FilmesClassificaes {
+  avaliacao_media Float
+  qtd_votos       Float
+}
+
+model filmes {
+  id             String             @id @default(auto()) @map("_id") @mongodb.ObjectId
+  ano_inicio     Int
+  duracao        Float              @map("Duração")
+  titulo         String             @map("Título")
+  classifica__es FilmesClassificaes @map("classificações")
+  diretores      String[]
+  generos        String[]
+  regiao         String?            @map("região")
+  tconst         String
+}

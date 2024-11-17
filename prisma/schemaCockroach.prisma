@@ -1,0 +1,12 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource cockroach {
+  provider = "cockroachdb"
+  url      = env("COCKROACH_URL")
+}
+
+enum crdb_internal_region {
+  gcp_southamerica_east1 @map("gcp-southamerica-east1")
+}
