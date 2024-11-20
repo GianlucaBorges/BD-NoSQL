@@ -1,9 +1,8 @@
-import { Router } from 'express';
-import { PrismaClient } from '@prisma/client';
+import { Router } from "express";
+import filmesRouter from "./routes/filmes.routes";
 
-const prisma = new PrismaClient();
 const router = Router();
 
-// adicionar rotas aqui
+router.use("/filmes", filmesRouter);
 
 export default router;

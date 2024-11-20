@@ -1,5 +1,6 @@
-generator client {
+generator clientMongo {
   provider = "prisma-client-js"
+  output = "../prisma/clientMongo"
 }
 
 datasource mongodb {
@@ -8,16 +9,16 @@ datasource mongodb {
 }
 
 type FilmesClassificaes {
-  avaliacao_media Float
-  qtd_votos       Float
+  avaliacao_media Float?            @map("Avaliacao_media")
+  qtd_votos       Float             @map("Qtd_votos")
 }
 
 model filmes {
   id             String             @id @default(auto()) @map("_id") @mongodb.ObjectId
-  ano_inicio     Int
+  ano            Int                @map("Ano_inicio")
   duracao        Float              @map("Duração")
   titulo         String             @map("Título")
-  classifica__es FilmesClassificaes @map("classificações")
+  classificacoes FilmesClassificaes @map("classificações")
   diretores      String[]
   generos        String[]
   regiao         String?            @map("região")
