@@ -23,4 +23,5 @@ model filmes {
   generos        String[]
   regiao         String?            @map("região")
   tconst         String
+  preco          Float
 }

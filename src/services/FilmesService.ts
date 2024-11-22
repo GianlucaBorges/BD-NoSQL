@@ -1,5 +1,5 @@
-import { Prisma } from "@prisma/client";
 import prismaMongo from "../clientMongo";
+import { Prisma } from "../../prisma/clientMongo";
 
 interface IFilme {
   page: number;
@@ -31,6 +31,7 @@ export default class FilmesService {
         id: true,
         ano: true,
         titulo: true,
+        preco: true,
       },
       take: limit,
       skip: offset,
@@ -97,6 +98,7 @@ export default class FilmesService {
           generos: true,
           titulo: true,
           regiao: true,
+          preco: true,
         },
         where: {
           id,
