@@ -24,4 +24,5 @@ model filmes {
   regiao         String?            @map("região")
   tconst         String
   preco          Float
+  capa           String
 }
