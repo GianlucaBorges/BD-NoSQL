@@ -1,5 +1,6 @@
-generator client {
+generator clientCockroach {
   provider = "prisma-client-js"
+  output   = "../prisma/clientCockroach"
 }
 
 datasource cockroach {
@@ -9,4 +10,11 @@ datasource cockroach {
 
 enum crdb_internal_region {
   gcp_southamerica_east1 @map("gcp-southamerica-east1")
+}
+
+model usuarios {
+  id        Int      @id @default(sequence())
+  nome      String
+  email     String   @unique
+  senha     String
 }

@@ -52,8 +52,6 @@ Grupo:
   npx prisma generate --schema ./prisma/schemaCockroach.prisma
 ```
 
-O comando para gerar o esquema do CockroachDB irá dar erro enquanto o esquema do banco de dados não for adicionado.
-
 ## **Execução**
 
 Para iniciar o servidor, execute o comando:
