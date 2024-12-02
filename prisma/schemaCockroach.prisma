@@ -13,8 +13,30 @@ enum crdb_internal_region {
 }
 
 model usuarios {
-  id        Int      @id @default(sequence())
-  nome      String
-  email     String   @unique
-  senha     String
+  id    Int    @id @default(sequence()) @cockroach.Int2
+  nome  String
+  email String @unique
+  senha String
+
+  pedido pedido[]
+}
+
+model pedido {
+  id        Int            @id @default(sequence()) @map("id_pedido") @cockroach.Int2
+  idUsuario Int            @map("id_usuario") @cockroach.Int2
+  total     Float
+  usuario   usuarios       @relation(fields: [idUsuario], references: [id])
+  itens     pedido_itens[]
+}
+
+model pedido_itens {
+  idPedido      Int      @map("id_pedido") @cockroach.Int2
+  idFilme       String   @map("id_filme")
+  dataPedido    DateTime @default(now()) @map("data_pedido") @cockroach.Date
+  dataDevolucao DateTime @map("data_devolucao") @cockroach.Date
+  quantidade    Int      @cockroach.Int2
+  preco         Float    @cockroach.Float4
+  pedido        pedido   @relation(fields: [idPedido], references: [id])
+
+  @@id([idPedido, idFilme])
 }

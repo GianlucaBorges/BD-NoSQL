@@ -59,7 +59,7 @@ export default class UsuariosService {
   }
 
   public async login(email: string, senha: string): Promise<IUsuario> {
-    const usuarios = await prismaCockroach.usuarios
+    const user = await prismaCockroach.usuarios
       .findFirst({
         where: {
           email,
@@ -69,7 +69,7 @@ export default class UsuariosService {
         throw new Error("Erro ao buscar usuário");
       });
 
-    if (!usuarios) {
+    if (!user) {
       throw new Error("Login ou senha inválidos");
     }
 
@@ -80,7 +80,7 @@ export default class UsuariosService {
     }
 
     const match = await argon2
-      .verify(usuarios.senha, senha, {
+      .verify(user.senha, senha, {
         secret: Buffer.from(argonSecret),
       })
       .catch(() => {
@@ -97,13 +97,17 @@ export default class UsuariosService {
       throw new Error("Secret não configurado");
     }
 
-    const token = sign({}, jwtSecret, {
+    const payload = {
+      id: user.id,
+    };
+
+    const token = sign(payload, jwtSecret, {
       expiresIn: "1d",
     });
 
     return {
-      nome: usuarios.nome,
-      email: usuarios.email,
+      nome: user.nome,
+      email: user.email,
       token: `Bearer ${token}`,
     };
   }

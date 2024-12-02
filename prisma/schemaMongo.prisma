@@ -1,6 +1,6 @@
 generator clientMongo {
   provider = "prisma-client-js"
-  output = "../prisma/clientMongo"
+  output   = "../prisma/clientMongo"
 }
 
 datasource mongodb {
@@ -9,8 +9,8 @@ datasource mongodb {
 }
 
 type FilmesClassificaes {
-  avaliacao_media Float?            @map("Avaliacao_media")
-  qtd_votos       Float             @map("Qtd_votos")
+  avaliacao_media Float? @map("Avaliacao_media")
+  qtd_votos       Float  @map("Qtd_votos")
 }
 
 model filmes {

@@ -1,19 +1,20 @@
+import "dotenv/config";
 import { NextFunction, Request, Response } from "express";
 import { verify } from "jsonwebtoken";
-import "dotenv/config";
 
 export default function isAuthenticated(
   request: Request,
   response: Response,
   next: NextFunction
-): void | Response {
+): void {
   const authHeader = request.headers.authorization;
 
   if (!authHeader) {
-    return response.status(401).json({
+    response.status(401).json({
       status: "error",
       message: "JWT token is missing",
     });
+    return;
   }
 
   const [, token] = authHeader.split(" ");
@@ -22,16 +23,17 @@ export default function isAuthenticated(
     const jwtSecret = process.env.JWT_SECRET;
 
     if (!jwtSecret) {
-      return response.status(500).json({
+      response.status(500).json({
         status: "error",
         message: "Internal server error",
       });
+      return;
     }
 
     const decodeToken = verify(token, jwtSecret);
 
     if (!decodeToken) {
-      return response.status(401).json({
+      response.status(401).json({
         status: "error",
         message: "Invalid JWT token",
       });
@@ -39,7 +41,7 @@ export default function isAuthenticated(
 
     return next();
   } catch (error) {
-    return response.status(401).json({
+    response.status(401).json({
       status: "error",
       message: "Invalid JWT token",
     });
