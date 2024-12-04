@@ -74,4 +74,45 @@ export class PedidosController {
       return;
     }
   }
+
+  async getPedidosUsuario(req: Request, res: Response): Promise<void> {
+    const authHeader = req.headers.authorization!;
+
+    const [, token] = authHeader.split(" ");
+
+    const jwtSecret = process.env.JWT_SECRET;
+
+    const decodedToken = verify(token, jwtSecret!) as {
+      id: number;
+      iat: number;
+      exp: number;
+    };
+
+    if (!decodedToken || !decodedToken.id) {
+      res.status(400).json({ message: "Parâmetros inválidos" });
+      return;
+    }
+
+    const service = new PedidosService();
+
+    try {
+      const pedidos = await service.getPedidosUsuario(decodedToken.id);
+
+      res.json(pedidos);
+      return;
+    } catch (error) {
+      if (error instanceof Error) {
+        res.status(500).json({
+          status: "error",
+          message: error.message,
+        });
+        return;
+      }
+      res.status(500).json({
+        status: "error",
+        message: "Erro interno do servidor",
+      });
+      return;
+    }
+  }
 }

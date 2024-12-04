@@ -62,7 +62,6 @@ export class UsuariosController {
 
     try {
       const usuario = await service.login(body.email, body.senha);
-      console.log(usuario);
       res.json(usuario);
       return;
     } catch (error) {

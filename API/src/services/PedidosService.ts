@@ -1,4 +1,3 @@
-import * as argon2 from "argon2";
 import "dotenv/config";
 import prismaCockroach from "../clientCockroach";
 import prismaMongo from "../clientMongo";
@@ -70,8 +69,12 @@ export default class PedidosService {
       });
 
     if (isFilmeAlugado.length > 0) {
-      const filmesAlugados = isFilmeAlugado.map((pedido) => pedido.itens.map((item) => item.idFilme));
-      throw new Error(`IDs dos filmes já alugados: ${filmesAlugados.join(", ")}`);
+      const filmesAlugados = isFilmeAlugado.map((pedido) =>
+        pedido.itens.map((item) => item.idFilme)
+      );
+      throw new Error(
+        `IDs dos filmes já alugados: ${filmesAlugados.join(", ")}`
+      );
     }
 
     const total = filmes.reduce((acc, filme) => {
@@ -103,59 +106,91 @@ export default class PedidosService {
     });
   }
 
-  public async getPedidosByUser(idUsuario: number) {
-    try {
-      // Check if the user exists
-      const usuarioExists = await prismaCockroach.usuarios.findFirst({
-        where: {
-          id: idUsuario,
-        },
-      });
-
-      if (!usuarioExists) {
-        throw new Error("Usuário não encontrado");
-      }
-
-      // Fetch all pedidos for the user, including associated items
-      const pedidos = await prismaCockroach.pedido.findMany({
+  public async getPedidosUsuario(idUsuario: number) {
+    const pedidos = await prismaCockroach.pedido
+      .findMany({
         where: {
           idUsuario,
         },
-        select: {
-          id: true,
-          total: true,
+        include: {
           itens: {
             select: {
-              idFilme: true,
-              quantidade: true,
               preco: true,
-              dataDevolucao: true,
               dataPedido: true,
+              dataDevolucao: true,
+              quantidade: true,
+              idFilme: true,
+            },
+            orderBy: {
+              dataPedido: "desc",
             },
           },
         },
-        // orderBy: {
-        //   itens:{
-
-        //   } // Orders by the most recent first
-        // },
+      })
+      .catch(() => {
+        throw new Error("Erro ao buscar pedidos");
       });
 
-      // Format the response
-      return pedidos.map((pedido) => ({
-        idPedido: pedido.id,
-        total: pedido.total,
-        filmes: pedido.itens.map((item) => ({
-          idFilme: item.idFilme,
-          quantidade: item.quantidade,
-          preco: item.preco,
-          dataDevolucao: item.dataDevolucao,
-          dataPedido: item.dataPedido,
-        })),
-      }));
-    } catch (error) {
-      console.error("Erro ao buscar pedidos:", error);
-      throw new Error("Erro ao buscar pedidos");
+    if (pedidos.length === 0) {
+      return [];
     }
+
+    const pedidosFormatados = pedidos.map((pedido) => {
+      const itens = pedido.itens.map((item) => {
+        return {
+          idFilme: item.idFilme,
+          preco: item.preco * item.quantidade,
+          dataPedido: item.dataPedido,
+          dataDevolucao: item.dataDevolucao,
+        };
+      });
+
+      return {
+        id: pedido.id,
+        total: pedido.total,
+        itens,
+      };
+    });
+
+    const filmes = await prismaMongo.filmes
+      .findMany({
+        select: {
+          id: true,
+          titulo: true,
+        },
+        where: {
+          id: {
+            in: pedidosFormatados.flatMap((pedido) =>
+              pedido.itens.map((item) => item.idFilme)
+            ),
+          },
+        },
+      })
+      .catch(() => {
+        throw new Error("Erro ao buscar filmes");
+      });
+
+    console.log(filmes);
+
+    if (filmes.length === 0) {
+      throw new Error("Filmes não encontrados");
+    }
+
+    const res = pedidosFormatados.map((pedido) => {
+      const itens = pedido.itens.map((item) => {
+        const filme = filmes.find((filme) => filme.id === item.idFilme);
+        return {
+          ...item,
+          titulo: filme!.titulo,
+        };
+      });
+
+      return {
+        ...pedido,
+        itens,
+      };
+    });
+
+    return res;
   }
 }
