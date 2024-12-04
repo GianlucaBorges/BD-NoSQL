@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { verify } from "jsonwebtoken";
-import PedidosService from "../services/PedidosService";
+import PedidosService from "src/services/PedidosService";
 
 export class PedidosController {
   async createPedido(req: Request, res: Response): Promise<void> {

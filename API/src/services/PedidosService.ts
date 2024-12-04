@@ -1,7 +1,7 @@
 import * as argon2 from "argon2";
 import "dotenv/config";
-import prismaCockroach from "../clientCockroach";
-import prismaMongo from "../clientMongo";
+import prismaCockroach from "src/clientCockroach";
+import prismaMongo from "src/clientMongo";
 
 export default class PedidosService {
   public async createUsuario(

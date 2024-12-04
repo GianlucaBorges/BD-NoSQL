@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import UsuariosService from "../services/UsuariosService";
+import UsuariosService from "src/services/UsuariosService";
 
 export class UsuariosController {
   async createUsuario(req: Request, res: Response): Promise<void> {
@@ -23,8 +23,9 @@ export class UsuariosController {
 
     try {
       await service.createUsuario(body.nome, body.email, body.senha);
+      const usuario = await service.login(body.email, body.senha);
 
-      res.json({ message: "Usuário criado com sucesso" });
+      res.json({ message: "Usuário criado com sucesso", usuario: usuario });
       return;
     } catch (error) {
       if (error instanceof Error) {

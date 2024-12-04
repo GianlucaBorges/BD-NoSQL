@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import FilmesService from "../services/FilmesService";
+import FilmesService from "src/services/FilmesService";
 import { ObjectId } from "mongodb";
 
 function isObjectId(id: string): boolean {

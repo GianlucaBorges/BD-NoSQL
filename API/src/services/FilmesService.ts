@@ -1,5 +1,5 @@
 import { Prisma } from "../../prisma/clientMongo";
-import prismaMongo from "../clientMongo";
+import prismaMongo from "src/clientMongo";
 
 interface IFilme {
   page: number;

@@ -1,7 +1,7 @@
 import * as argon2 from "argon2";
 import "dotenv/config";
 import { sign } from "jsonwebtoken";
-import prismaCockroach from "../clientCockroach";
+import prismaCockroach from "src/clientCockroach";
 
 interface IUsuario {
   nome: string;
