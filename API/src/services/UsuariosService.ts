@@ -1,7 +1,7 @@
 import * as argon2 from "argon2";
 import "dotenv/config";
 import { sign } from "jsonwebtoken";
-import prismaCockroach from "src/clientCockroach";
+import prismaCockroach from "../clientCockroach";
 
 interface IUsuario {
   nome: string;
@@ -10,11 +10,7 @@ interface IUsuario {
 }
 
 export default class UsuariosService {
-  public async createUsuario(
-    nome: string,
-    email: string,
-    senha: string
-  ): Promise<void> {
+  public async createUsuario(nome: string, email: string, senha: string): Promise<void> {
     const argonSecret = process.env.ARGON_SECRET;
     const argonSalt = process.env.ARGON_SALT;
 

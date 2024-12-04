@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import UsuariosService from "src/services/UsuariosService";
+import UsuariosService from "../services/UsuariosService";
 
 export class UsuariosController {
   async createUsuario(req: Request, res: Response): Promise<void> {
@@ -62,7 +62,7 @@ export class UsuariosController {
 
     try {
       const usuario = await service.login(body.email, body.senha);
-
+      console.log(usuario);
       res.json(usuario);
       return;
     } catch (error) {

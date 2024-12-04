@@ -1,5 +1,5 @@
 import { Prisma } from "../../prisma/clientMongo";
-import prismaMongo from "src/clientMongo";
+import prismaMongo from "../clientMongo";
 
 interface IFilme {
   page: number;
@@ -20,11 +20,7 @@ function escapeRegex(input: string): string {
 }
 
 export default class FilmesService {
-  public async getFilmes(
-    page: number,
-    per_page: number,
-    titulo?: string
-  ): Promise<IFilme> {
+  public async getFilmes(page: number, per_page: number, titulo?: string): Promise<IFilme> {
     const limit = per_page;
     const offset = page * limit;
 
@@ -65,14 +61,9 @@ export default class FilmesService {
       };
     }
 
-    const [count, filmes] = await prismaMongo
-      .$transaction([
-        prismaMongo.filmes.count(countOptions),
-        prismaMongo.filmes.findMany(findManyOptions),
-      ])
-      .catch(() => {
-        throw new Error("Erro ao buscar filmes");
-      });
+    const [count, filmes] = await prismaMongo.$transaction([prismaMongo.filmes.count(countOptions), prismaMongo.filmes.findMany(findManyOptions)]).catch(() => {
+      throw new Error("Erro ao buscar filmes");
+    });
 
     const totalPages = Math.ceil(count / limit);
 

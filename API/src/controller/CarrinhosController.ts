@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import CarrinhosService from "src/services/CarrinhosService";
+import CarrinhosService from "../services/CarrinhosService";
 import express from "express";
 
 export class CarrinhosController {
@@ -13,8 +13,6 @@ export class CarrinhosController {
 
     try {
       const carrinho = await CarrinhosService.getKey(key.toString());
-      console.log("resultado");
-      console.log(carrinho);
 
       res.json(carrinho);
       return;

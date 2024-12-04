@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { FilmesController } from "src/controller/FilmesController";
+import { FilmesController } from "../controller/FilmesController";
 
 const filmesRouter = Router();
 const filmesController = new FilmesController();

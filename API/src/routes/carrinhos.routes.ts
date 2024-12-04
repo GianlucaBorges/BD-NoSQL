@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { CarrinhosController } from "src/controller/CarrinhosController";
+import { CarrinhosController } from "../controller/CarrinhosController";
 
 const carrinhosRouter = Router();
 const carrinhosController = new CarrinhosController();

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { verify } from "jsonwebtoken";
-import PedidosService from "src/services/PedidosService";
+import PedidosService from "../services/PedidosService";
 
 export class PedidosController {
   async createPedido(req: Request, res: Response): Promise<void> {
@@ -48,10 +48,7 @@ export class PedidosController {
       return;
     } catch (error) {
       if (error instanceof Error) {
-        if (
-          error.message === "Usuário não encontrado" ||
-          error.message === "Filme não encontrado"
-        ) {
+        if (error.message === "Usuário não encontrado" || error.message === "Filme não encontrado") {
           res.status(404).json({
             status: "error",
             message: error.message,

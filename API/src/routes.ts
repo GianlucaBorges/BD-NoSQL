@@ -1,8 +1,8 @@
 import { Router } from "express";
-import filmesRouter from "src/routes/filmes.routes";
-import pedidosRouter from "src/routes/pedidos.routes";
-import usuariosRouter from "src/routes/usuarios.routes";
-import carrinhosRouter from "src/routes/carrinhos.routes";
+import filmesRouter from "./routes/filmes.routes";
+import pedidosRouter from "./routes/pedidos.routes";
+import usuariosRouter from "./routes/usuarios.routes";
+import carrinhosRouter from "./routes/carrinhos.routes";
 
 const router = Router();
 
