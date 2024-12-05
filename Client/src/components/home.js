@@ -29,6 +29,10 @@ const Home = () => {
     localStorage.setItem("user", JSON.stringify(user));
   };
 
+  useEffect(() => {
+    GetCarrinhoRedis();
+  }, [user]);
+
   const fetchMovies = (searchValue = "") => {
     const baseURL = "http://localhost:3001/api/filmes/paginate";
     const page = 0;
@@ -48,11 +52,14 @@ const Home = () => {
     if (localStorage.getItem("user") !== null && typeof localStorage.getItem("user") !== undefined) {
       setUser(JSON.parse(localStorage.getItem("user")));
     }
-    if (localStorage.getItem("sessionId") !== null && typeof localStorage.getItem("sessionId") !== undefined) {
+    if (localStorage.getItem("sessionId") == null || typeof localStorage.getItem("sessionId") == undefined || localStorage.getItem("sessionId") == "") {
       // If it doesn't exist, create a new session ID and store it in localStorage
-      setSessionId(generateSessionId());
-      localStorage.setItem("sessionId", sessionId);
+      console.log("aaaa");
+      let sessao = generateSessionId();
+      setSessionId(sessao);
+      localStorage.setItem("sessionId", sessao);
     } else {
+      console.log(`localStorage.getItem("sessionId") = ${localStorage.getItem("sessionId")}`);
       setSessionId(localStorage.getItem("sessionId"));
     }
     if (user) {
@@ -61,7 +68,10 @@ const Home = () => {
       setChave(sessionId);
     }
     fetchMovies();
-    GetCarrinhoRedis();
+    console.log(user);
+    setTimeout(() => {
+      GetCarrinhoRedis();
+    }, 500);
   }, []);
 
   useEffect(() => {
@@ -71,19 +81,29 @@ const Home = () => {
     } else {
       setChave(sessionId);
     }
+    console.log("salvando carrinho");
     if (salvarCarrinho) {
       salvarCarrinhoRedis();
     }
   }, [salvarCarrinho]);
 
   const salvarCarrinhoRedis = () => {
-    if (chave) {
+    console.log(user);
+    let chaveSet = "";
+
+    if (!user && !localStorage.getItem("user")) {
+      chaveSet = localStorage.getItem("sessionId");
+    } else {
+      chaveSet = user.email || JSON.parse(localStorage.getItem("user")).email;
+    }
+
+    if (chaveSet) {
       fetch("http://localhost:3001/api/carrinhos/put", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ carrinhoJson: carrinho, key: `carrinhos-${chave}` }),
+        body: JSON.stringify({ carrinhoJson: carrinho, key: `carrinhos-${chaveSet}` }),
       })
         .then((response) => response.json())
         .then(() => setSalvarCarrinho(false))
@@ -92,22 +112,32 @@ const Home = () => {
   };
 
   const GetCarrinhoRedis = () => {
-    if (user) {
-      setChave(user.email);
+    let chaveSet = "";
+    console.log(`sessionId:${sessionId}`);
+    console.log(`user:${user}`);
+    if (!user && !localStorage.getItem("user")) {
+      chaveSet = localStorage.getItem("sessionId");
     } else {
-      setChave(sessionId);
+      chaveSet = user?.email || JSON.parse(localStorage.getItem("user")).email;
     }
-    if (chave) {
-      fetch(`http://localhost:3001/api/carrinhos?key=carrinhos-${chave}`)
+    console.log(chaveSet);
+    if (chaveSet) {
+      fetch(`http://localhost:3001/api/carrinhos?key=carrinhos-${chaveSet}`)
         .then((response) => response.json())
         .then((data) => {
-          if (data) {
-            setCarrinho(data || []);
+          console.log(`data: ${data}`);
+          console.log(`carrinho: ${carrinho}`);
+          console.log(`user: ${user}`);
+          if (data && Object.keys(data).length > 0) {
+            console.log("aaaaaaaaa");
+            setCarrinho(data);
+          } else {
+            if (!user) {
+              setCarrinho([]);
+            }
           }
         })
         .catch((error) => console.error("Error fetching carrinhos:", error));
-    } else {
-      setCarrinho([]);
     }
   };
 
@@ -152,7 +182,13 @@ const Home = () => {
 
   return (
     <>
-      <Navbar toggleCarrinho={toggleCarrinho} toggleModalLogin={toggleModalLogin} fetchMovies={fetchMovies} GetCarrinhoRedis={GetCarrinhoRedis} />
+      <Navbar
+        toggleCarrinho={toggleCarrinho}
+        toggleModalLogin={toggleModalLogin}
+        fetchMovies={fetchMovies}
+        GetCarrinhoRedis={GetCarrinhoRedis}
+        salvarCarrinhoRedis={salvarCarrinhoRedis}
+      />
       <Box bg="white" color="black" minH="100vh" p={4}>
         <SimpleGrid columns={[1, 2, 3, 4]} spacing={4}>
           {movies?.map((movie) => (
@@ -184,8 +220,25 @@ const Home = () => {
             </Box>
           ))}
         </SimpleGrid>
-        {selectedMovie && <ModalFilme isOpen={isModalOpen} onClose={onCloseModal} movie={selectedMovie} setCarrinho={setCarrinho} carrinho={carrinho} />}
-        <Carrinho isOpen={disclosureCarrinho.isOpen} onClose={disclosureCarrinho.onClose} carrinho={carrinho} setCarrinho={setCarrinho} user={user} />
+        {selectedMovie && (
+          <ModalFilme
+            isOpen={isModalOpen}
+            onClose={onCloseModal}
+            movie={selectedMovie}
+            setCarrinho={setCarrinho}
+            carrinho={carrinho}
+            salvarCarrinhoRedis={salvarCarrinhoRedis}
+            setSalvarCarrinho={setSalvarCarrinho}
+          />
+        )}
+        <Carrinho
+          isOpen={disclosureCarrinho.isOpen}
+          onClose={disclosureCarrinho.onClose}
+          carrinho={carrinho}
+          setCarrinho={setCarrinho}
+          user={user}
+          setSalvarCarrinho={setSalvarCarrinho}
+        />
         <ModalLogin
           isOpen={disclosureModalLogin.isOpen}
           onClose={disclosureModalLogin.onClose}
@@ -193,6 +246,7 @@ const Home = () => {
           setUser={setUser}
           GetCarrinhoRedis={GetCarrinhoRedis}
           saveUserLocalStorage={saveUserLocalStorage}
+          salvarCarrinhoRedis={salvarCarrinhoRedis}
         />
       </Box>
     </>

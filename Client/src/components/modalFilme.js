@@ -15,18 +15,20 @@ import {
 } from "@chakra-ui/react";
 import { AddIcon, MinusIcon } from "@chakra-ui/icons";
 
-const ModalFilme = ({ isOpen, onClose, movie, setCarrinho, carrinho }) => {
+const ModalFilme = ({ isOpen, onClose, movie, setCarrinho, carrinho, salvarCarrinhoRedis, setSalvarCarrinho }) => {
   const [days, setDays] = useState(1);
 
   async function handleConfirm() {
     movie.days = days;
     setCarrinho((carrinho) => [...carrinho, movie]);
-    onClose();
     setDays(1);
+    setSalvarCarrinho(true);
+
+    onClose();
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="lg">
+    <Modal isOpen={isOpen} onClose={onClose} size="xl">
       <ModalOverlay />
       <ModalContent bg="white" color="black">
         <ModalHeader>{movie.titulo}</ModalHeader>

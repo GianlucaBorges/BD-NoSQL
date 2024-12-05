@@ -13,18 +13,27 @@ import {
   FormLabel,
   useDisclosure,
   VStack,
+  HStack,
+  Box,
   Text,
+  Grid,
+  Table,
+  Tr,
+  Thead,
+  Th,
+  Tbody,
+  Td,
 } from "@chakra-ui/react";
 import { AddIcon, MinusIcon } from "@chakra-ui/icons";
 
-const ModalLogin = ({ isOpen, onClose, user, setUser, GetCarrinhoRedis, saveUserLocalStorage }) => {
+const ModalLogin = ({ isOpen, onClose, user, setUser, GetCarrinhoRedis, saveUserLocalStorage, salvarCarrinhoRedis }) => {
   const [cadastrar, setCadastrar] = useState(false);
+  const [historico, setHistorico] = useState([]);
   const [formValues, setFormValues] = useState({
     email: "",
     nome: "",
     senha: "",
   });
-
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormValues((prev) => ({
@@ -37,16 +46,24 @@ const ModalLogin = ({ isOpen, onClose, user, setUser, GetCarrinhoRedis, saveUser
     setCadastrar((prevCadastrar) => !prevCadastrar); // This is the proper way to toggle a boolean
   }
 
-  const pegaHistorico = () => {
-    // fetch(`http://localhost:3001/api/pedidos?key=carrinhos-${chave}`)
-    //   .then((response) => response.json())
-    //   .then((data) => {
-    //     if (data) {
-    //       setCarrinho(data || []);
-    //     }
-    //   })
-    //   .catch((error) => console.error("Error fetching carrinhos:", error));
-  };
+  useEffect(() => {
+    if (user) {
+      fetch(`http://localhost:3001/api/pedidos`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: user.token,
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data) {
+            console.log(data);
+            setHistorico(data || []);
+          }
+        })
+        .catch((error) => console.error("Error fetching historico de Pedidos:", error));
+    }
+  }, [user]);
 
   function fazerLoginOuCadastro() {
     if (cadastrar) {
@@ -66,8 +83,7 @@ const ModalLogin = ({ isOpen, onClose, user, setUser, GetCarrinhoRedis, saveUser
           setUser(data.usuario);
           saveUserLocalStorage(data.usuario);
         })
-        .catch((error) => console.error("Error Login:", error))
-        .finally(() => GetCarrinhoRedis());
+        .catch((error) => console.error("Error Login:", error));
     } else {
       fetch("http://localhost:3001/api/Usuarios/login", {
         method: "POST",
@@ -84,19 +100,19 @@ const ModalLogin = ({ isOpen, onClose, user, setUser, GetCarrinhoRedis, saveUser
           setUser(data);
           saveUserLocalStorage(data);
         })
-        .catch((error) => console.error("Error Login:", error))
-        .finally(() => GetCarrinhoRedis());
+        .catch((error) => console.error("Error Login:", error));
     }
   }
 
   function disconect() {
-    setUser(false);
+    salvarCarrinhoRedis();
+
     localStorage.removeItem("user");
-    GetCarrinhoRedis();
+    setUser(false);
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} isCentered>
+    <Modal isOpen={isOpen} onClose={onClose} isCentered size={"xl"}>
       <ModalOverlay />
       <ModalContent bg={"white"}>
         <ModalHeader>{user ? user.Nome : "Login"}</ModalHeader>
@@ -104,8 +120,40 @@ const ModalLogin = ({ isOpen, onClose, user, setUser, GetCarrinhoRedis, saveUser
         <ModalBody>
           {user && (
             <VStack spacing={4} alignItems={"start"}>
-              <Text>Olá {user.nome}</Text>
-              <Text> Pedidos:</Text>
+              <Text fontWeight={"bold"} fontSize={16}>
+                Olá {user.nome}
+              </Text>
+              <Text fontWeight={"bold"}> Pedidos:</Text>
+              {historico &&
+                historico.length > 0 &&
+                historico?.map((pedido) => (
+                  <Box width={"100%"}>
+                    <HStack fontWeight={"bold"}>
+                      <Text marginRight={"10%"}>Pedido feito em: {new Date(pedido.itens[0].dataPedido).toLocaleDateString()}</Text>
+                      <Text>Total do pedido: R$ {pedido.total}</Text>
+                    </HStack>
+                    <Text fontWeight={"bold"}>Filmes Alugados: </Text>
+
+                    <Table textAlign={"start"}>
+                      <Thead>
+                        <Tr>
+                          <Th>Título</Th>
+                          <Th>Preço</Th>
+                          <Th>Data de devolução</Th>
+                        </Tr>
+                      </Thead>
+                      <Tbody>
+                        {pedido.itens?.map((filme) => (
+                          <Tr>
+                            <Td>{filme.titulo}</Td>
+                            <Td>R$ {filme.preco}</Td>
+                            <Td>{new Date(filme.dataDevolucao).toLocaleDateString()}</Td>
+                          </Tr>
+                        ))}
+                      </Tbody>
+                    </Table>
+                  </Box>
+                ))}
             </VStack>
           )}
           {!user && (

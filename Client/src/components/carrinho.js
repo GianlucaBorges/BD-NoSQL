@@ -41,9 +41,8 @@ const ItemCarrinho = ({ title, year, price, onIncrease, onDecrease, quantity, ca
   </HStack>
 );
 
-const Carrinho = ({ isOpen, onClose, carrinho, setCarrinho, user }) => {
+const Carrinho = ({ isOpen, onClose, carrinho, setCarrinho, user, setSalvarCarrinho }) => {
   const total = carrinho.reduce((sum, item) => sum + item.preco * item.days, 0);
-  console.log(carrinho);
   const enviarPedido = () => {
     const filmes = carrinho.map((item) => ({
       idFilme: item.id,
@@ -67,16 +66,20 @@ const Carrinho = ({ isOpen, onClose, carrinho, setCarrinho, user }) => {
 
   const onIncrease = (id) => {
     setCarrinho((prev) => prev.map((item) => (item.id === id ? { ...item, days: item.days + 1 } : item)));
+    setSalvarCarrinho(true);
   };
 
   const onDecrease = (id) => {
     setCarrinho((prev) => prev.map((item) => (item.id === id && item.days > 1 ? { ...item, days: item.days - 1 } : item)));
+    setSalvarCarrinho(true);
   };
 
   const remove = (id) => {
+    console.log("aaa");
     setCarrinho(
       (prev) => prev.filter((item) => item.id !== id) // Remove items with 0 days
     );
+    setSalvarCarrinho(true);
   };
 
   return (

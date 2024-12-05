@@ -5,7 +5,7 @@ import express from "express";
 export class CarrinhosController {
   async getCarrinho(req: Request, res: Response): Promise<void> {
     const key = req.query.key;
-    console.log(key);
+    console.log(`get ${key}`);
     if (!key) {
       res.status(400).json({ message: "Parâmetros inválidos" });
       return;
@@ -15,6 +15,7 @@ export class CarrinhosController {
       const carrinho = await CarrinhosService.getKey(key.toString());
 
       res.json(carrinho);
+
       return;
     } catch (error) {
       if (error instanceof Error) {
@@ -42,7 +43,7 @@ export class CarrinhosController {
   async setCarrinho(req: Request, res: Response): Promise<void> {
     const body = req.body;
     const { carrinhoJson, key } = body; // Destructure the variables
-    console.log("setouzerado krl");
+    console.log(`set ${key}`);
 
     if (!carrinhoJson || !key) {
       res.status(400).json({ message: "Parâmetros inválidos" });
